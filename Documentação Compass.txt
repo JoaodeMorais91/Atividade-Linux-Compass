@@ -1,0 +1,75 @@
+﻿Primeiro foi instalado o Apache sendo utilizado o comando: 
+sudo yum install httpd 
+
+
+Para iniciar o serviço Apache foi utilizado o comando:
+sudo systemctl start httpd
+ 
+Em seguida foi feito a habilitação do serviço:
+sudo systemctl enable httpd
+
+
+foi atualizado o sistema do serviço NFS foi utilizado o comando:
+sudo yum update
+
+
+Em seguida foi instalado o serviço NFS com o comando:
+sudo yum install nfs-utils
+
+
+Iniciando e habilitando o serviço NFS com os comandos:
+sudo systemctl start nfs-server
+sudo systemctl enable nfs-server
+
+
+Configurei o diretório para ser compartilhado:
+/home/joao *(rw,sync,no_root_squash)
+
+
+
+
+Foi desenvolvido o seguinte script para verificar se o serviço do 
+apache esta Online ou Offline
+
+
+SERVICE_NAME="httpd"
+NFS_DIR="/mnt/joao"
+LOG_DIR="/home/joao"
+
+
+
+# Obtém a data e hora atuais
+DATE_TIME=$(date +"%Y-%m-%d %H:%M:%S")
+
+
+
+# Verifica o status do serviço
+if systemctl is-active --quiet "$SERVICE_NAME"; then
+STATUS="ONLINE"
+MESSAGE="O serviço está online."
+OUTPUT_FILE="$NFS_DIR/serviceonline.txt"
+else
+STATUS="OFFLINE"
+MESSAGE="O serviço não está em execução."
+OUTPUT_FILE="$NFS_DIR/serviceoffline.txt"
+fi
+
+
+
+# Grava um registro do status do serviço
+LOG_FILE="$LOG_DIR/service_status_log.txt"
+echo "$DATE_TIME - $SERVICE_NAME - Status: $STATUS - $MESSAGE" >> "$LOG_FILE"
+
+
+
+# Cria o arquivo de saída
+echo "Data e Hora: $DATE_TIME" > "$OUTPUT_FILE"
+echo "Serviço: $SERVICE_NAME" >> "$OUTPUT_FILE"
+echo "Status: $STATUS" >> "$OUTPUT_FILE"
+echo "Mensagem: $MESSAGE" >> "$OUTPUT_FILE"
+Para o Script acima ser executado a cada 5 minutos foi configurado o Crontab 
+seguinte forma.
+Para isso foi preciso editar o arquivo de configuração com este comando:
+crontab -e 
+Então adicionei a seguinte linha no arquivo citado a cima:
+*/5 * * * * sudo bash /home/ec2-user/script.sh
